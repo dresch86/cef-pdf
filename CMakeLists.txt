@@ -112,6 +112,7 @@
 #
 
 cmake_minimum_required(VERSION 2.8.12.1)
+set (CMAKE_CXX_STANDARD 11)
 
 if(APPLE)
     set(PROJECT_ARCH x86_64)

@@ -1,5 +1,5 @@
 #include "Client.h"
-#include "Server/Server.h"
+#include "Server/TcpServer.h"
 #include "Job/Remote.h"
 #include "Job/StdInput.h"
 
@@ -50,6 +50,7 @@ void printHelp(std::string name)
     std::cout << std::endl;
     std::cout << "Server options:" << std::endl;
     std::cout << "  --server          Start HTTP server" << std::endl;
+    std::cout << "  --uds=<socket>      If starting server, specify UNIX domain socket." << std::endl;
     std::cout << "  --host=<host>     If starting server, specify ip address to bind to." << std::endl;
     std::cout << "                    Default is " << cefpdf::constants::serverHost << std::endl;
     std::cout << "  --port=<port>     Specify server port number. Default is " << cefpdf::constants::serverPort << std::endl;
@@ -202,7 +203,7 @@ int runServer(CefRefPtr<cefpdf::Client> app, CefRefPtr<CefCommandLine> commandLi
         host = commandLine->GetSwitchValue("host").ToString();
     }
 
-    CefRefPtr<cefpdf::server::Server> server = new cefpdf::server::Server(app, host, port);
+    CefRefPtr<cefpdf::server::TcpServer> server = new cefpdf::server::TcpServer(app, host, port);
 
     server->Start();
 

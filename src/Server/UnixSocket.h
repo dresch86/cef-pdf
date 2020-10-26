@@ -1,5 +1,5 @@
-#ifndef SERVER_SERVER_H_
-#define SERVER_SERVER_H_
+#ifndef SERVER_UNIXSOCKET_H_
+#define SERVER_UNIXSOCKET_H_
 
 #include "../Client.h"
 #include "SessionManager.h"
@@ -12,14 +12,15 @@
 
 #include <asio.hpp>
 
+#if !defined(OS_WIN)
 namespace cefpdf {
 namespace server {
 
-class Server : public CefBaseRefCounted
+class UnixSocket : public CefBaseRefCounted
 {
 
 public:
-    Server(CefRefPtr<cefpdf::Client> client, std::string const&, std::string const&);
+    UnixSocket(CefRefPtr<cefpdf::Client> client, std::string const&);
 
     void Start();
 
@@ -38,21 +39,21 @@ private:
 
     asio::io_service m_ioService;
 
+    asio::local::stream_protocol::acceptor m_acceptor;
+
+    asio::local::stream_protocol::socket m_socket;
+
     asio::signal_set m_signals;
-
-    asio::ip::tcp::acceptor m_acceptor;
-
-    asio::ip::tcp::socket m_socket;
 
     CefRefPtr<SessionManager> m_sessionManager;
 
     int m_counter;
 
     // Include the default reference counting implementation.
-    IMPLEMENT_REFCOUNTING(Server);
+    IMPLEMENT_REFCOUNTING(UnixSocket);
 };
 
 } // namespace server
 } // namespace cefpdf
-
-#endif // SERVER_SERVER_H_
+#endif
+#endif // SERVER_UNIXSOCKET_H_

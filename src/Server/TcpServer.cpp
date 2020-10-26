@@ -1,4 +1,4 @@
-#include "Server.h"
+#include "TcpServer.h"
 
 #include "include/wrapper/cef_helpers.h"
 #include "include/base/cef_bind.h"
@@ -11,7 +11,7 @@
 namespace cefpdf {
 namespace server {
 
-Server::Server(
+TcpServer::TcpServer(
     CefRefPtr<cefpdf::Client> client,
     const std::string& address,
     const std::string& port
@@ -39,9 +39,9 @@ Server::Server(
     m_acceptor.bind(endpoint);
 }
 
-void Server::Start()
+void TcpServer::Start()
 {
-    m_thread = std::thread(std::bind(&Server::Run, this));
+    m_thread = std::thread(std::bind(&TcpServer::Run, this));
 
     m_client->SetAllowedSchemes({"http", "https", "ftp", "data", cefpdf::constants::scheme});
     m_client->Run();
@@ -49,12 +49,12 @@ void Server::Start()
     m_thread.join();
 }
 
-void Server::Run()
+void TcpServer::Run()
 {
     m_acceptor.listen();
 
     m_signals.async_wait(std::bind(
-        &Server::OnSignal,
+        &TcpServer::OnSignal,
         this,
         std::placeholders::_1,
         std::placeholders::_2
@@ -76,18 +76,18 @@ void Server::Run()
     DLOG(INFO) << "HTTP server thread finished";
 }
 
-void Server::Listen()
+void TcpServer::Listen()
 {
     DLOG(INFO) << "Server::Listen";
 
     m_acceptor.async_accept(m_socket, std::bind(
-        &Server::OnConnection,
+        &TcpServer::OnConnection,
         this,
         std::placeholders::_1
     ));
 }
 
-void Server::OnSignal(std::error_code error, int signno)
+void TcpServer::OnSignal(std::error_code error, int signno)
 {
     DLOG(INFO) << "HTTP server received shutdown signal";
 
@@ -95,7 +95,7 @@ void Server::OnSignal(std::error_code error, int signno)
     m_sessionManager->CloseAll();
 }
 
-void Server::OnConnection(std::error_code error)
+void TcpServer::OnConnection(std::error_code error)
 {
     // Check whether the server was stopped by a signal before this
     // completion handler had a chance to run.
